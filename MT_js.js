@@ -1,11 +1,13 @@
 var control_offset = -120;
-// - 173
-// + 61
+// - 173(laptop), 189(desktop)
+// + 61(laptio), 187(desktop)
 var thumb_count = 0;
 
 var selected_thumb = "";
 var selected_title = "";
 var selected_desc = "";
+
+
 
 function expandMenu(){
     var bot_coor = parseInt(get_style_val("control", "bottom"));
@@ -19,13 +21,16 @@ function expandMenu(){
 
 function changeColor(){
     if(selected_thumb != ""){
+        
         document.getElementById(selected_title).style.color = document.getElementById("ctrl_color").value;
-        document.getElementById(selected_desc).style.color = document.getElementById("ctrl_color").value
+       
+        document.getElementById(selected_desc).style.color = document.getElementById("ctrl_color").value;
+        
+        
     }else{
         document.getElementById("title").style.color = document.getElementById("ctrl_color").value;
-        document.getElementById("description").style.color = document.getElementById("ctrl_color").value
+        document.getElementById("description").style.color = document.getElementById("ctrl_color").value;
     }
-    
 }
 
 function changeDescription(){
@@ -48,9 +53,9 @@ function changeTitle(){
 
 function changeBG(source_url){
     if(selected_thumb != ""){
-        document.getElementById(selected_thumb).style.background = "url('"+ source_url+ "')"
+        document.getElementById(selected_thumb).style.background = "url('"+ source_url+ "')";
     }else{
-        document.getElementById("background").style.background = "url('"+ source_url+ "')"
+        document.getElementById("background").style.background = "url('"+ source_url+ "')";
     }
     
 }
@@ -59,15 +64,18 @@ function moveBG(keyCode){
     var coor_array = get_curr_bg_coor();
     var parsed_x_coor = parseInt(coor_array[0]);
     var parsed_y_coor = parseInt(coor_array[1]);
-    var curr_bg_height = parseInt(get_style_val("background", "height"));
-    console.log(parsed_x_coor);
-    console.log(parsed_y_coor);
+    var curr_bg_height = "";
+
+    
     
     var ctrl_target = document.getElementById("background");
     if(selected_thumb != ""){
         ctrl_target = document.getElementById(selected_thumb);
-        
+        curr_bg_height = parseInt(get_style_val(selected_thumb, "height"));
+    }else{
+        curr_bg_height = parseInt(get_style_val("background", "height"));
     }
+    
     if(keyCode == 38){
         parsed_y_coor -= 10;
         ctrl_target.style.backgroundPosition = parsed_x_coor + "px " + parsed_y_coor + "px";
@@ -80,17 +88,17 @@ function moveBG(keyCode){
     }else if(keyCode == 37){
              parsed_x_coor -= 10;
         ctrl_target.style.backgroundPosition = parsed_x_coor + "px " + parsed_y_coor + "px";
-    }else if(keyCode == 173){
+    }else if(keyCode == 189){
         curr_bg_height -= 10;
         ctrl_target.style.height = curr_bg_height + "px";
-    }else if(keyCode == 61){
+    }else if(keyCode == 187){
         curr_bg_height += 10;
         ctrl_target.style.height = curr_bg_height + "px";
     }
 }
 
 function get_style_val (ID, attribute){
-    var result = window.getComputedStyle(document.getElementById(ID)).getPropertyValue(attribute)
+    var result = window.getComputedStyle(document.getElementById(ID)).getPropertyValue(attribute);
     
     return result;
 }
@@ -107,7 +115,7 @@ function get_curr_bg_coor(){
     }
     
     
-    return split_coors
+    return split_coors;
 }
 
 function check_change_bg_url(input_str){
@@ -135,8 +143,27 @@ function check_change_bg_url(input_str){
     return check_result;    
 }
 
+function change_selection(element_id){
+    selected_thumb = element_id;
+    if(element_id == "background"){
+            
+        selected_title = "title";
+        selected_desc = "description";
+
+    }else{
+        selected_title = "thumb_title_"+element_id;
+        selected_desc = "thumb_Desc_"+element_id;
+
+    }
+        
+    console.log("selected thumb: "+selected_thumb);
+    console.log("selected title: "+selected_title);
+    console.log("selected description: "+selected_desc);   
+}
+
+
 function create_thumb(){
-    thumb_count += 1;
+    
     nDiv = document.createElement("div");
     nDivT = document.createElement("div");
     nDivD = document.createElement("div");
@@ -145,42 +172,44 @@ function create_thumb(){
     nDivT.className = "imgTitle";
     nDivD.className = "imgDesc";
      
-    nDiv.id = "thumb_img_" + thumb_count;
+    nDiv.id = thumb_count;
     nDivT.id = "thumb_title_" + thumb_count;
     nDivD.id = "thumb_Desc_" + thumb_count;
     
     var copy_img = document.getElementById("background");
     var copy_title = document.getElementById("title");
-    var copty_desc = document.getElementById("description");
+    var copy_desc = document.getElementById("description");
     
     if(selected_thumb != ""){
         copy_img = document.getElementById(selected_thumb);
         copy_title = document.getElementById(selected_title);
-        copty_desc = document.getElementById(selected_desc);
+        copy_desc = document.getElementById(selected_desc);
     }
+    
+    
     
     nDiv.style.background = copy_img.style.background;
     nDivT.innerHTML = copy_title.innerHTML;
-    nDivD.innerHTML = copty_desc.innerHTML;
+    nDivD.innerHTML = copy_desc.innerHTML;
     
     nDivT.style.color = copy_title.style.color;
-    nDivD.style.color = copty_desc.style.color;
+    nDivD.style.color = copy_desc.style.color;
+    nDiv.style.height = copy_img.style.height;
     
-    nDiv.onclick = function(){change_selection(nDiv.id)};
+    var new_div_id = nDiv.id;
+    var new_title_id = nDivT.id;
+    var new_desc_id = nDivD.id;
+    
     
     document.getElementById("display").appendChild (nDiv);
     nDiv.appendChild (nDivT);
     nDiv.appendChild (nDivD);
     
-    selected_thumb = nDiv.id;
-    selected_desc = nDivD.id;
-    selected_title = nDivT.id;
-}
+    
+    
+    nDiv.onclick = function(){change_selection(new_div_id)};
 
-function change_selection(item_id){
-    selected_thumb = item_id;
 }
-
 
 
 document.getElementById("ctrl_toggle").addEventListener("click", function(){
@@ -223,7 +252,11 @@ document.body.addEventListener("keydown", function(ev){
 });
 
 document.getElementById("add_thumb_butt").addEventListener("click", function(){
+    thumb_count += 1;
     create_thumb()
+    selected_thumb = thumb_count;
+    selected_desc = "thumb_Desc_"+thumb_count;
+    selected_title = "thumb_title_"+thumb_count;
         
     
 });
